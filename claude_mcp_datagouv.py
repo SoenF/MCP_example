@@ -50,15 +50,15 @@ def _truncate(text: str, max_len: int = 400) -> str:
     return text if len(text) <= max_len else text[:max_len] + "…"
 
 
-def _log_content_block(block: Any, turn: int) -> None:
+def _log_content_block(block: Any) -> None:
     """Logge chaque bloc de contenu de la réponse avec son type."""
     btype = getattr(block, "type", "unknown")
 
     if btype == "text":
-        log.info(f"  [TURN {turn}][← LLM TEXT] {_truncate(block.text)}")
+        log.info(f"  [← LLM TEXT] {_truncate(block.text)}")
 
     elif btype == "mcp_tool_use":
-        log.info(f"  [TURN {turn}][→ MCP CALL ] tool={block.name!r}  server={block.server_name!r}")
+        log.info(f"  [→ MCP CALL ] tool={block.name!r}  server={block.server_name!r}")
         log.info(f"               input={json.dumps(block.input, ensure_ascii=False)}")
 
     elif btype == "mcp_tool_result":
@@ -67,11 +67,11 @@ def _log_content_block(block: Any, turn: int) -> None:
             first = block.content[0]
             content_text = first.text if getattr(first, "type", "") == "text" else repr(first)
         status = "ERROR" if getattr(block, "is_error", False) else "OK"
-        log.info(f"  [TURN {turn}][← MCP RESULT] id={block.tool_use_id}  status={status}")
+        log.info(f"  [← MCP RESULT] id={block.tool_use_id}  status={status}")
         log.info(f"               {_truncate(content_text, 300)}")
 
     else:
-        log.info(f"  [TURN {turn}][BLOCK] type={btype}")
+        log.info(f"  [BLOCK] type={btype}")
 
 
 # ─────────────────────────── Core ──────────────────────────────
@@ -87,7 +87,7 @@ def run(query: str) -> str:
     log.info(f"  Query      : {query}")
     log.info(DIVIDER)
 
-    log.info("  [TURN 1][→ LLM] Envoi de la requête initiale…")
+    log.info("  [→ LLM] Envoi de la requête…")
 
     response = client.beta.messages.create(
         model=MODEL,
@@ -119,7 +119,7 @@ def run(query: str) -> str:
     # Le connector gère la boucle MCP en interne ; tous les blocs
     # (tool_use, tool_result, text final) arrivent dans response.content
     for block in response.content:
-        _log_content_block(block, turn=1)
+        _log_content_block(block)
 
     final_text = "\n\n".join(
         block.text for block in response.content
