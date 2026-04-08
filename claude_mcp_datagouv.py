@@ -118,11 +118,13 @@ def run(query: str) -> str:
 
     # Le connector gère la boucle MCP en interne ; tous les blocs
     # (tool_use, tool_result, text final) arrivent dans response.content
-    final_text = ""
     for block in response.content:
         _log_content_block(block, turn=1)
-        if getattr(block, "type", "") == "text":
-            final_text = block.text  # on garde le dernier bloc texte
+
+    final_text = "\n\n".join(
+        block.text for block in response.content
+        if getattr(block, "type", "") == "text"
+    )
 
     log.info(DIVIDER)
     return final_text
