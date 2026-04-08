@@ -23,7 +23,7 @@ load_dotenv()
 # ─────────────────────────── Config ────────────────────────────
 
 DATAGOUV_MCP_URL = "https://mcp.data.gouv.fr/mcp"
-MODEL = "claude-opus-4-6"
+MODEL = "claude-haiku-4-5-20251001"
 MAX_TOKENS = 4096
 
 DEFAULT_QUERY = (
