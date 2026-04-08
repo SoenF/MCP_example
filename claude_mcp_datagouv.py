@@ -139,3 +139,4 @@ if __name__ == "__main__":
     print("RÉPONSE FINALE")
     print("=" * 70)
     print(answer)
+#  uv run python claude_mcp_datagouv.py "Cherche des données sur le logement en France"
